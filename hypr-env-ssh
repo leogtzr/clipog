@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# hypr-env-ssh: Auto-sets Hyprland vars for SSH
+
+# Force XDG_RUNTIME_DIR
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+if [[ ! -d "$XDG_RUNTIME_DIR" ]]; then
+    echo "Error: XDG_RUNTIME_DIR not found" >&2
+    exit 1
+fi
+
+# Find the long signature dir (your pattern: hash_numbers_numbers)
+INSTANCE_DIR=$(ls -1 "$XDG_RUNTIME_DIR/hypr/" 2>/dev/null | grep -E '^[a-f0-9]{40}_[0-9]+_[0-9]+$' | head -n1)
+if [[ -z "$INSTANCE_DIR" ]]; then
+    echo "Error: No Hyprland instance found in $XDG_RUNTIME_DIR/hypr/" >&2
+    exit 1
+fi
+
+export HYPRLAND_INSTANCE_SIGNATURE="$INSTANCE_DIR"
+
+# Detect WAYLAND_DISPLAY dynamically (checks for existing socket)
+WAYLAND_SOCKET=$(ls "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null | head -n1 | xargs basename)
+if [[ -z "$WAYLAND_SOCKET" ]]; then
+    WAYLAND_SOCKET="wayland-1"  # Common fallback for Hyprland
+fi
+export WAYLAND_DISPLAY="$WAYLAND_SOCKET"
+
+# echo "Done activating env variables for clipboard management → $HYPRLAND_INSTANCE_SIGNATURE / $WAYLAND_DISPLAY"

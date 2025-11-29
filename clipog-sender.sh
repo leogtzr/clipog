@@ -22,7 +22,7 @@ trap cleanup EXIT
 trap cleanup ERR INT TERM HUP
 
 if pbpaste > "${LOCAL_CLIPBOARD_CONTENT_FILE}"; then
-    scp "${LOCAL_CLIPBOARD_CONTENT_FILE}" "leo@omarchy.local:${REMOTE_CLIPBOARD_CONTENT_FILE}" > /dev/null 2>&1
+    scp "${LOCAL_CLIPBOARD_CONTENT_FILE}" "${REMOTE_USER}@${REMOTE_HOSTNAME}:${REMOTE_CLIPBOARD_CONTENT_FILE}" > /dev/null 2>&1
     ssh -t "${REMOTE_USER}@${REMOTE_HOSTNAME}" "bash -lc 'wl-copy < ${REMOTE_CLIPBOARD_CONTENT_FILE} && notify-send 📋 \"Clipboard content received\" '" 2> /dev/null
 fi
 
